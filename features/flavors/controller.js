@@ -1,3 +1,5 @@
+const jwt = require('jsonwebtoken');
+
 const Flavor = require('./model');
 const { returnError } = require('../utils');
 
@@ -19,19 +21,27 @@ exports.getFlavors = (req, res) =>
 
 // @desc Create a flavor
 // @route POST /api/ice-creams/flavors
-// @access Public
+// @access Protected
 exports.addFlavor = (req, res) =>
-  Flavor.create(req.body)
-    .then(newFlavor => res.status(201).json({ success: true, data: newFlavor }))
-    .catch(error => {
-      if (error.code === 11000) {
-        returnError(
-          res,
-          error,
-          400,
-          `The flavor with the name "${req.body.name}" already exists`
-        );
-      } else {
-        returnError(res, error, 500, 'Error creating flavor');
-      }
-    });
+  jwt.verify(req.token, process.env.JWT_SECRET_KEY, error => {
+    if (error) {
+      res.sendStatus(403);
+    } else {
+      Flavor.create(req.body)
+        .then(newFlavor =>
+          res.status(201).json({ success: true, data: newFlavor })
+        )
+        .catch(err => {
+          if (err.code === 11000) {
+            returnError(
+              res,
+              err,
+              400,
+              `The flavor with the name "${req.body.name}" already exists`
+            );
+          } else {
+            returnError(res, err, 500, 'Error creating flavor');
+          }
+        });
+    }
+  });
