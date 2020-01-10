@@ -1,5 +1,5 @@
 const Flavor = require('./model');
-const { returnError } = require('../utils/db');
+const { returnError } = require('../utils');
 
 // @desc Get all flavors
 // @route GET /api/ice-creams/flavors
@@ -23,4 +23,15 @@ exports.getFlavors = (req, res) =>
 exports.addFlavor = (req, res) =>
   Flavor.create(req.body)
     .then(newFlavor => res.status(201).json({ success: true, data: newFlavor }))
-    .catch(error => returnError(res, error, 500, 'Error creating flavor'));
+    .catch(error => {
+      if (error.code === 11000) {
+        returnError(
+          res,
+          error,
+          400,
+          `The flavor with the name "${req.body.name}" already exists`
+        );
+      } else {
+        returnError(res, error, 500, 'Error creating flavor');
+      }
+    });

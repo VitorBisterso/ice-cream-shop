@@ -10,6 +10,7 @@ connectDB();
 const app = express();
 app.use(express.json());
 
+app.use('/api/users', require('./features/users/routes'));
 app.use('/api/ice-creams/flavors', require('./features/flavors/routes'));
 
 if (process.env.NODE_ENV === 'production') {
