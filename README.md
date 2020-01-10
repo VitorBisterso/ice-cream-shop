@@ -8,4 +8,5 @@ To run the app, you will have to create a `config.env` file inside the `config` 
 PORT=SOME_PORT_NUMBER
 NODE_ENV=development
 MONGO_URI=xxxxx
+JWT_SECRET_KEY=xxxxx
 ```
