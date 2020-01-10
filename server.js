@@ -8,10 +8,9 @@ dotenv.config({ path: './config/config.env' });
 connectDB();
 
 const app = express();
+app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.send('Api is working');
-});
+app.use('/api/ice-creams/flavors', require('./features/flavors/routes'));
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(`${__dirname}/public/`));
