@@ -13,6 +13,6 @@ exports.verifyToken = (req, res, next) => {
 
     next();
   } else {
-    res.sendStatus(403);
+    return res.sendStatus(403);
   }
 };

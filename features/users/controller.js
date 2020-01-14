@@ -17,12 +17,8 @@ exports.register = (req, res) => {
   });
 
   if (newUser.password && newUser.password.length < 5) {
-    return returnError(
-      res,
-      null,
-      400,
-      'Password must be at least 5 characters long'
-    );
+    const errorMessage = 'Password must be at least 5 characters long';
+    return returnError(res, errorMessage, 400, errorMessage);
   }
   bcrypt.hash(newUser.password, 10, (error, hash) => {
     newUser.password = hash;
@@ -31,15 +27,14 @@ exports.register = (req, res) => {
       .then(user => res.json({ success: true, data: user }))
       .catch(err => {
         if (err.code === 11000) {
-          returnError(
+          return returnError(
             res,
             err,
             400,
             `The user with the email "${email}" already exists`
           );
-        } else {
-          returnError(res, err, 500, 'Error creating user');
         }
+        return returnError(res, err, 500, 'Error creating user');
       });
   });
 };
@@ -52,24 +47,19 @@ exports.login = async (req, res) => {
 
   const user = await User.findOne({ email });
   if (!user) {
-    return returnError(
-      res,
-      null,
-      404,
-      `The user with the email "${email}" was not found`
-    );
+    const errorMessage = `The user with the email "${email}" was not found`;
+    return returnError(res, errorMessage, 404, errorMessage);
   }
   bcrypt.compare(password, user.password, (error, equal) => {
     if (!equal) {
-      return returnError(res, null, 400, 'Wrong password');
+      const errorMessage = 'Wrong password';
+      return returnError(res, errorMessage, 400, errorMessage);
     }
     jwt.sign(
       { user },
       process.env.JWT_SECRET_KEY,
       { expiresIn: '10d' },
-      (err, token) => {
-        res.json({ success: true, token });
-      }
+      (err, token) => res.json({ success: true, token })
     );
   });
 };
